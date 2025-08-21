@@ -1,5 +1,7 @@
-import 'package:flutter/cupertino.dart';
+import 'package:all/repository/screens/gamerate.dart';
+import 'package:all/repository/screens/logoutscreen.dart';
 import 'package:flutter/material.dart';
+
 
 class Navbar extends StatefulWidget {
   const Navbar({super.key});
@@ -35,7 +37,9 @@ class _NavbarState extends State<Navbar> {
               ListTile(
               leading: Icon(Icons.star_border_outlined),
               title: Text("Game Rate"),
-              onTap: null,
+              onTap: (){
+                Navigator.push(context, MaterialPageRoute(builder: (context)=>Gamerate()));
+              },
               ),
             ],
           ),
@@ -67,7 +71,9 @@ class _NavbarState extends State<Navbar> {
           ListTile(
             leading: Icon(Icons.logout),
             title: Text("Logout"),
-            onTap: null,
+            onTap: (){
+              Navigator.push(context, MaterialPageRoute(builder: (context)=>LogoutPage()));
+            },
           ),
         ],
       ),
