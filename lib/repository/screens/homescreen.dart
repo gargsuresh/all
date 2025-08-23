@@ -7,34 +7,29 @@ import '../../utils/session_manager.dart';
 import 'navbar.dart';
 import '../../repository/models/market_model.dart';
 
-
-
-// Function to check status + color
-
+/// ✅ Top-level function for dynamic betting status
 Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
   DateTime now = DateTime.now();
 
-  DateTime today = DateTime(now.year, now.month, now.day);
+  DateTime parseTime(String time) {
+    final inputFormat = RegExp(r"(\d{1,2}):(\d{2})\s?(AM|PM)", caseSensitive: false);
+    final match = inputFormat.firstMatch(time);
+    if (match != null) {
+      int hour = int.parse(match.group(1)!);
+      int minute = int.parse(match.group(2)!);
+      String period = match.group(3)!.toUpperCase();
+      if (period == "PM" && hour != 12) hour += 12;
+      if (period == "AM" && hour == 12) hour = 0;
+      return DateTime(now.year, now.month, now.day, hour, minute);
+    }
+    return now;
+  }
 
-  // Parse open time
-  List<String> openParts = openTime.split(RegExp(r"[:\s]"));
-  int openHour = int.parse(openParts[0]);
-  int openMinute = int.parse(openParts[1]);
-  if (openParts[2].toUpperCase() == "PM" && openHour != 12) openHour += 12;
-  if (openParts[2].toUpperCase() == "AM" && openHour == 12) openHour = 0;
-  DateTime openDateTime = today.add(Duration(hours: openHour, minutes: openMinute));
+  DateTime openDateTime = parseTime(openTime);
+  DateTime closeDateTime = parseTime(closeTime);
 
-  // Parse close time
-  List<String> closeParts = closeTime.split(RegExp(r"[:\s]"));
-  int closeHour = int.parse(closeParts[0]);
-  int closeMinute = int.parse(closeParts[1]);
-  if (closeParts[2].toUpperCase() == "PM" && closeHour != 12) closeHour += 12;
-  if (closeParts[2].toUpperCase() == "AM" && closeHour == 12) closeHour = 0;
-  DateTime closeDateTime = today.add(Duration(hours: closeHour, minutes: closeMinute));
-
-  // Status logic
   if (now.isBefore(openDateTime)) {
-    return {"text": "Betting Is Closed", "color": Colors.red};
+    return {"text": "Betting Is Running", "color": Colors.green};
   } else if (now.isAfter(openDateTime) && now.isBefore(closeDateTime)) {
     return {"text": "Betting Is Running", "color": Colors.green};
   } else if (now.isAtSameMomentAs(closeDateTime)) {
@@ -43,15 +38,6 @@ Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
     return {"text": "Betting Is Closed", "color": Colors.red};
   }
 }
-
-
-
-
-
-
-
-
-
 
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
@@ -64,9 +50,6 @@ class _HomescreenState extends State<Homescreen> {
   String walletBalance = "0";
   List<Market> markets = [];
   bool isLoading = true;
-
-
-
 
   @override
   void initState() {
@@ -84,14 +67,12 @@ class _HomescreenState extends State<Homescreen> {
 
   Future<void> fetchMarkets() async {
     final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
-
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-
       final marketsJson = data["markets"] as List;
       final List<Market> fetchedMarkets = marketsJson.map((e) => Market.fromJson(e)).toList();
 
-      // 🔹 Sort markets by open_time
+      // Sort markets by open_time
       fetchedMarkets.sort((a, b) {
         DateTime timeA = _parseTime(a.opent);
         DateTime timeB = _parseTime(b.opent);
@@ -107,34 +88,21 @@ class _HomescreenState extends State<Homescreen> {
     }
   }
 
-
-// Helper function to parse "10:00 AM" → DateTime
   DateTime _parseTime(String time) {
     try {
-      return DateTime.parse(
-          "${DateTime.now().toIso8601String().split("T")[0]} ${_formatTime24(time)}:00"
-      );
-    } catch (e) {
-      return DateTime.now();
-    }
+      final inputFormat = RegExp(r"(\d{1,2}):(\d{2})\s?(AM|PM)", caseSensitive: false);
+      final match = inputFormat.firstMatch(time);
+      if (match != null) {
+        int hour = int.parse(match.group(1)!);
+        int minute = int.parse(match.group(2)!);
+        String period = match.group(3)!.toUpperCase();
+        if (period == "PM" && hour != 12) hour += 12;
+        if (period == "AM" && hour == 12) hour = 0;
+        return DateTime.now().copyWith(hour: hour, minute: minute);
+      }
+    } catch (e) {}
+    return DateTime.now();
   }
-
-  String _formatTime24(String time) {
-    final inputFormat = RegExp(r"(\d{1,2}):(\d{2})\s?(AM|PM)", caseSensitive: false);
-    final match = inputFormat.firstMatch(time);
-    if (match != null) {
-      int hour = int.parse(match.group(1)!);
-      int minute = int.parse(match.group(2)!);
-      String period = match.group(3)!.toUpperCase();
-
-      if (period == "PM" && hour != 12) hour += 12;
-      if (period == "AM" && hour == 12) hour = 0;
-
-      return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
-    }
-    return "00:00"; // default
-  }
-
 
   @override
   Widget build(BuildContext context) {
@@ -175,10 +143,10 @@ class _HomescreenState extends State<Homescreen> {
                 child: Row(
                   children: [
                     Icon(Icons.account_balance_wallet, color: Colors.black),
-                    SizedBox(width: 6),
+                    const SizedBox(width: 6),
                     Text(
                       "₹ $walletBalance",
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
@@ -191,7 +159,7 @@ class _HomescreenState extends State<Homescreen> {
       ),
       body: SafeArea(
         child: isLoading
-            ? Center(child: CircularProgressIndicator(color: Colors.orange))
+            ? const Center(child: CircularProgressIndicator(color: Colors.orange))
             : ListView(
           padding: const EdgeInsets.all(12),
           children: [
@@ -270,6 +238,8 @@ class GameCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final status = getBettingStatus(openTime, closeTime); // ✅ Dynamic status
+
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -296,9 +266,9 @@ class GameCard extends StatelessWidget {
             ),
             const SizedBox(height: 6),
             Text(
-              getBettingStatus(openTime, closeTime)["text"],
+              status["text"],
               style: TextStyle(
-                color: getBettingStatus(openTime, closeTime)["color"],
+                color: status["color"],
                 fontWeight: FontWeight.bold,
               ),
             ),
