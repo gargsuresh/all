@@ -7,6 +7,52 @@ import '../../utils/session_manager.dart';
 import 'navbar.dart';
 import '../../repository/models/market_model.dart';
 
+
+
+// Function to check status + color
+
+Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
+  DateTime now = DateTime.now();
+
+  DateTime today = DateTime(now.year, now.month, now.day);
+
+  // Parse open time
+  List<String> openParts = openTime.split(RegExp(r"[:\s]"));
+  int openHour = int.parse(openParts[0]);
+  int openMinute = int.parse(openParts[1]);
+  if (openParts[2].toUpperCase() == "PM" && openHour != 12) openHour += 12;
+  if (openParts[2].toUpperCase() == "AM" && openHour == 12) openHour = 0;
+  DateTime openDateTime = today.add(Duration(hours: openHour, minutes: openMinute));
+
+  // Parse close time
+  List<String> closeParts = closeTime.split(RegExp(r"[:\s]"));
+  int closeHour = int.parse(closeParts[0]);
+  int closeMinute = int.parse(closeParts[1]);
+  if (closeParts[2].toUpperCase() == "PM" && closeHour != 12) closeHour += 12;
+  if (closeParts[2].toUpperCase() == "AM" && closeHour == 12) closeHour = 0;
+  DateTime closeDateTime = today.add(Duration(hours: closeHour, minutes: closeMinute));
+
+  // Status logic
+  if (now.isBefore(openDateTime)) {
+    return {"text": "Betting Is Closed", "color": Colors.red};
+  } else if (now.isAfter(openDateTime) && now.isBefore(closeDateTime)) {
+    return {"text": "Betting Is Running", "color": Colors.green};
+  } else if (now.isAtSameMomentAs(closeDateTime)) {
+    return {"text": "Betting Is Running For Close", "color": Colors.orange};
+  } else {
+    return {"text": "Betting Is Closed", "color": Colors.red};
+  }
+}
+
+
+
+
+
+
+
+
+
+
 class Homescreen extends StatefulWidget {
   const Homescreen({super.key});
 
@@ -18,6 +64,9 @@ class _HomescreenState extends State<Homescreen> {
   String walletBalance = "0";
   List<Market> markets = [];
   bool isLoading = true;
+
+
+
 
   @override
   void initState() {
@@ -85,53 +134,6 @@ class _HomescreenState extends State<Homescreen> {
     }
     return "00:00"; // default
   }
-
-
-  // Function to check status + color
-
-  Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
-    DateTime now = DateTime.now();
-
-    // Time parsing: HH:mm format
-    DateTime today = DateTime(now.year, now.month, now.day);
-    List<String> openParts = openTime.split(":");
-    List<String> closeParts = closeTime.split(":");
-
-    DateTime openDateTime = today.add(
-        Duration(hours: int.parse(openParts[0]), minutes: int.parse(openParts[1])));
-    DateTime closeDateTime = today.add(
-        Duration(hours: int.parse(closeParts[0]), minutes: int.parse(closeParts[1])));
-
-    // Check the status
-    if (now.isBefore(openDateTime)) {
-      return {
-        "text": "Betting Is Closed",
-        "color": Colors.red,
-      };
-    } else if (now.isAtSameMomentAs(closeDateTime)) {
-      return {
-        "text": "Betting Is Running For Close",
-        "color": Colors.orange,
-      };
-    } else if (now.isAfter(openDateTime) && now.isBefore(closeDateTime)) {
-      return {
-        "text": "Betting Is Running",
-        "color": Colors.green,
-      };
-    } else if (now.isAfter(closeDateTime)) {
-      return {
-        "text": "Betting Is Closed",
-        "color": Colors.red,
-      };
-    }
-
-    return {
-      "text": "Unknown Status",
-      "color": Colors.grey,
-    };
-  }
-
-
 
 
   @override
@@ -293,8 +295,13 @@ class GameCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 6),
-            const Text("Betting Is Running For Close",
-                style: TextStyle(color: Colors.orange)),
+            Text(
+              getBettingStatus(openTime, closeTime)["text"],
+              style: TextStyle(
+                color: getBettingStatus(openTime, closeTime)["color"],
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             const SizedBox(height: 8),
             Row(
               children: [
