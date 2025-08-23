@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../../../domain/constants/appcolors.dart';
 import '../../api_service.dart';
+import '../../utils/session_manager.dart';
 import '../widgets/uihelper.dart';
 import 'bottomnavscreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class Loginscreen extends StatefulWidget {
   const Loginscreen({super.key});
@@ -14,7 +17,22 @@ class Loginscreen extends StatefulWidget {
 }
 
 class _LoginscreenState extends State<Loginscreen> {
-  // ✅ Proper controllers
+
+  Future<void> _storeUser(Map<String, dynamic> user) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('user_id', int.tryParse(user['id'].toString()) ?? 0);
+    await prefs.setString('fname', user['fname'] ?? '');
+    await prefs.setString('lname', user['lname'] ?? '');
+    await prefs.setString('mobile', user['mobile'] ?? '');
+    await SessionManager.setWalletBalance(user['credit'].toString());
+
+    // convenience: full name
+    final fullName = '${user['fname'] ?? ''} ${user['lname'] ?? ''}'.trim();
+    await prefs.setString('full_name', fullName);
+  }
+
+
+
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController passController = TextEditingController();
 
@@ -23,6 +41,8 @@ class _LoginscreenState extends State<Loginscreen> {
   void loginUser() async {
     String phone = phoneController.text.trim();
     String password = passController.text.trim();
+
+
 
     if (phone.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -35,10 +55,15 @@ class _LoginscreenState extends State<Loginscreen> {
       isLoading = true;
     });
 
-    try {
-      var response = await ApiService.login(phone, password); // 👈 call backend
 
+
+    try {
+      var response = await ApiService.login(phone, password); // call backend
+      //print(" Login API Response: $response");
       if (response['success'] == true) {
+        // server se aaya user object store
+        await _storeUser(Map<String, dynamic>.from(response['user'] ?? {}));
+
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => BottomNavscreen()),
@@ -130,7 +155,7 @@ class _LoginscreenState extends State<Loginscreen> {
                       ),
                       SizedBox(height: 10),
                       Text("Don't Have an Account?"),
-                      TextButton(
+                      ElevatedButton(
                         onPressed: () {
                           Navigator.pushReplacement(
                             context,

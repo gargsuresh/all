@@ -1,3 +1,4 @@
+import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -18,7 +19,32 @@ class _WithdrawscreenState extends State<Withdrawscreen> {
         backgroundColor: Colors.orange,
         title: const Text('Withdrawal',
             style: TextStyle(fontWeight: FontWeight.bold)),
-
+        actions: [
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2,color: Colors.black),
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: const [
+                    Icon(Icons.account_balance_wallet, color: Colors.black),
+                    SizedBox(width: 5),
+                    Text("₹393", style: TextStyle(color: Colors.black)),
+                  ],
+                ),
+              )
+          )
+        ],
       ),
      body: Padding(
         padding: const EdgeInsets.all(16),

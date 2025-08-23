@@ -1,6 +1,9 @@
 import 'package:all/repository/screens/gamerate.dart';
 import 'package:all/repository/screens/logoutscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+
 
 
 class Navbar extends StatefulWidget {
@@ -9,8 +12,27 @@ class Navbar extends StatefulWidget {
   @override
   State<Navbar> createState() => _NavbarState();
 }
-
 class _NavbarState extends State<Navbar> {
+  String userName = "";
+  String userPhone = "";
+  String userEmail = "";
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final fullName = prefs.getString('full_name') ??
+        '${prefs.getString('fname') ?? ''} ${prefs.getString('lname') ?? ''}'.trim();
+    setState(() {
+      userName = (fullName.isEmpty) ? "Guest User" : fullName;
+      userPhone = prefs.getString('mobile') ?? "";
+      userEmail = prefs.getString('email') ?? "";
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -18,16 +40,24 @@ class _NavbarState extends State<Navbar> {
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          UserAccountsDrawerHeader(accountName: Text('Suresh Garg'), accountEmail: Text('sureshgarg@gmail.com'),
+          UserAccountsDrawerHeader(
+            accountName: Text(userName),
+            accountEmail: Text(userPhone.isNotEmpty ? userPhone : userEmail),
             currentAccountPicture: CircleAvatar(
-                child: ClipOval(
-                  child: Image.asset("assets/images/profile.jpg",width: 90,height: 90,fit: BoxFit.cover,),
-                )
+              child: ClipOval(
+                child: Image.asset(
+                  "assets/images/profile.jpg",
+                  width: 90,
+                  height: 90,
+                  fit: BoxFit.cover,
+                ),
+              ),
             ),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Colors.orange,
               image: DecorationImage(
-                image: AssetImage("assets/images/all.jpg"),fit: BoxFit.cover,
+                image: AssetImage("assets/images/all.jpg"),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -80,3 +110,5 @@ class _NavbarState extends State<Navbar> {
     );
   }
 }
+
+

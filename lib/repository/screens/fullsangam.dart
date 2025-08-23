@@ -2,6 +2,8 @@ import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/session_manager.dart';
+
 class Fullsangam extends StatefulWidget {
   const Fullsangam({super.key});
 
@@ -10,7 +12,23 @@ class Fullsangam extends StatefulWidget {
 }
 
 class _FullsangamState extends State<Fullsangam> {
-  // Aaj ki date dynamically generate
+
+
+  String walletBalance = "0";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBalance();
+  }
+
+  void _loadBalance() async {
+    String bal = await SessionManager.getWalletBalance();
+    setState(() {
+      walletBalance = bal;
+    });
+  }
+
   String get selectedDate => DateFormat('dd/MM/yyyy').format(DateTime.now());
 
   TextEditingController openPannaController = TextEditingController();
@@ -54,13 +72,39 @@ class _FullsangamState extends State<Fullsangam> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
-          IconButton(
-            onPressed: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Walletscreen()));
-            },
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-          ),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2,color: Colors.black),
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children:[
+                    Icon(Icons.account_balance_wallet, color: Colors.black),
+                    SizedBox(width: 5),
+
+                    Text(
+                      "₹ $walletBalance",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                  ],
+                ),
+              )
+          )
         ],
       ),
       body: Padding(

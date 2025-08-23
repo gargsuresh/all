@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
 import '../../../domain/constants/appcolors.dart';
 import '../widgets/uihelper.dart';
 import 'loginscreen.dart';
@@ -12,10 +11,11 @@ class Registerscreen extends StatefulWidget {
 }
 
 class _RegisterscreenState extends State<Registerscreen> {
+  var userNameController = TextEditingController();
   var firstNameController = TextEditingController();
   var lastNameController = TextEditingController();
   var mobileController = TextEditingController();
-  var emailController = TextEditingController();
+  // var emailController = TextEditingController();
   var passController = TextEditingController();
   var confirmPassController = TextEditingController();
   var referralController = TextEditingController();
@@ -24,17 +24,16 @@ class _RegisterscreenState extends State<Registerscreen> {
     String fname = firstNameController.text.trim();
     String lname = lastNameController.text.trim();
     String mobile = mobileController.text.trim();
-    String email = emailController.text.trim();
+    // String email = emailController.text.trim();
     String pass = passController.text.trim();
     String cpass = confirmPassController.text.trim();
     String referral = referralController.text.trim();
 
-    print("fname: $fname, lname: $lname, mobile: $mobile, email: $email, pass: $pass, cpass: $cpass");
-
+    ("fname: $fname, lname: $lname, mobile: $mobile, pass: $pass, cpass: $cpass");
     if (fname.isEmpty ||
         lname.isEmpty ||
         mobile.isEmpty ||
-        email.isEmpty ||
+        // email.isEmpty ||
         pass.isEmpty ||
         cpass.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -56,12 +55,12 @@ class _RegisterscreenState extends State<Registerscreen> {
         "first_name": fname,
         "last_name": lname,
         "mobile": mobile,
-        "email": email,
+        // "email": email,
         "password": pass,
         "referral_code": referral,
       });
 
-      print("API Response: ${response.body}");
+      ("API Response: ${response.body}");
 
       var data = jsonDecode(response.body);
       if (data["success"] == true) {
@@ -78,7 +77,7 @@ class _RegisterscreenState extends State<Registerscreen> {
         );
       }
     } catch (e) {
-      print("Error: $e");
+      ("Error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text("Error: $e")),
       );
@@ -89,6 +88,7 @@ class _RegisterscreenState extends State<Registerscreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       backgroundColor: Appcolors.scaffoldbackground,
       body: SingleChildScrollView(
         child: Center(
@@ -122,78 +122,81 @@ class _RegisterscreenState extends State<Registerscreen> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 child: Container(
                   padding: EdgeInsets.all(20),
-                  height: 700,
                   width: 400,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(10),
                     color: Color(0XFFFFDE59),
                   ),
-                  child: Column(
-                    children: [
-                      TextField(
-                        controller: firstNameController,
-                        decoration: InputDecoration(labelText: "Enter the first name"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: lastNameController,
-                        decoration: InputDecoration(labelText: "Enter the last name"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: mobileController,
-                        keyboardType: TextInputType.phone,
-                        decoration: InputDecoration(labelText: "Enter the mobile number"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: emailController,
-                        decoration: InputDecoration(labelText: "Email"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: passController,
-                        obscureText: true,
-                        decoration: InputDecoration(labelText: "Password"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: confirmPassController,
-                        obscureText: true,
-                        decoration: InputDecoration(labelText: "Confirm Password"),
-                      ),
-                      SizedBox(height: 15),
-                      TextField(
-                        controller: referralController,
-                        decoration: InputDecoration(labelText: "Referral Code (Optional)"),
-                      ),
-                      SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: registerUser,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.lightBlueAccent,
-                          minimumSize: Size(250, 50),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(15),
+                  child: SingleChildScrollView(   //  added scroll
+                    child: Column(
+                      children: [
+                        TextField(
+                          controller: firstNameController,
+                          decoration: InputDecoration(labelText: "Enter the first name",border: OutlineInputBorder(),),
+                        ),
+                        SizedBox(height: 15),
+
+                        TextField(
+                          controller: lastNameController,
+                          decoration: InputDecoration(labelText: "Enter the last name",border: OutlineInputBorder()),
+                        ),
+                        SizedBox(height: 15),
+
+                        TextField(
+                          controller: mobileController,
+                          keyboardType: TextInputType.phone,
+                          decoration: InputDecoration(labelText: "Enter the mobile number",border: OutlineInputBorder()),
+                        ),
+                        SizedBox(height: 15),
+
+                        TextField(
+                          controller: passController,
+                          obscureText: true,
+                          decoration: InputDecoration(labelText: "Password",border: OutlineInputBorder()),
+                        ),
+                        SizedBox(height: 15),
+
+                        TextField(
+                          controller: confirmPassController,
+                          obscureText: true,
+                          decoration: InputDecoration(labelText: "Confirm Password",border: OutlineInputBorder()),
+                        ),
+                        SizedBox(height: 15),
+
+                        TextField(
+                          controller: referralController,
+                          decoration: InputDecoration(labelText: "Referral Code (Optional)",border: OutlineInputBorder()),
+                        ),
+                        SizedBox(height: 20),
+
+                        ElevatedButton(
+                          onPressed: registerUser,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.lightBlueAccent,
+                            minimumSize: Size(250, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
+                            ),
+                          ),
+                          child: Text(
+                            "Register",
+                            style: TextStyle(fontSize: 20, color: Colors.black),
                           ),
                         ),
-                        child: Text(
-                          "Register",
-                          style: TextStyle(fontSize: 20, color: Colors.black),
+                        SizedBox(height: 10),
+
+                        Text("Already Have an Account?"),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(builder: (context) => Loginscreen()),
+                            );
+                          },
+                          child: Text("Log in"),
                         ),
-                      ),
-                      SizedBox(height: 10),
-                      Text("Already Have an Account?"),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => Loginscreen()),
-                          );
-                        },
-                        child: Text("Log in"),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

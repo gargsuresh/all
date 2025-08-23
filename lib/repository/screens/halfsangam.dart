@@ -2,6 +2,8 @@ import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/session_manager.dart';
+
 class Halfsangam extends StatefulWidget {
   const Halfsangam({super.key});
 
@@ -10,6 +12,26 @@ class Halfsangam extends StatefulWidget {
 }
 
 class _HalfsangamState extends State<Halfsangam> {
+
+
+
+  String walletBalance = "0";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBalance();
+  }
+
+  void _loadBalance() async {
+    String bal = await SessionManager.getWalletBalance();
+    setState(() {
+      walletBalance = bal;
+    });
+  }
+
+
+
   String selectedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
   TextEditingController openDigitController = TextEditingController();
@@ -54,7 +76,6 @@ class _HalfsangamState extends State<Halfsangam> {
 
   @override
   Widget build(BuildContext context) {
-    // हर बार build होने पर तारीख अपडेट
     selectedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
 
     return Scaffold(
@@ -73,18 +94,38 @@ class _HalfsangamState extends State<Halfsangam> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 10),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            child: Row(
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Walletscreen()));
-                }, icon: Icon(Icons.account_balance_wallet_outlined)),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2,color: Colors.black),
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet, color: Colors.black),
+                    const SizedBox(width: 5),
 
-                SizedBox(width: 5),
-              ],
-            ),
+                    Text(
+                      "₹ $walletBalance",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+
+                  ],
+                ),
+              )
           )
         ],
       ),

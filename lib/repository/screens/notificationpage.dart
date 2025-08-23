@@ -37,7 +37,7 @@ class _NotificationpageState extends State<Notificationpage> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => Walletscreen()));
+                              builder: (context) => AddFundsScreen()));
                     },
                     icon: Icon(Icons.account_balance_wallet_outlined)),
               ],

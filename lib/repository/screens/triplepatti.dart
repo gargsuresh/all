@@ -2,6 +2,8 @@ import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+import '../../utils/session_manager.dart';
+
 class Triplepatti extends StatefulWidget {
   const Triplepatti({super.key});
 
@@ -10,6 +12,25 @@ class Triplepatti extends StatefulWidget {
 }
 
 class _TriplepattiState extends State<Triplepatti> {
+
+  String walletBalance = "0";
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBalance();
+  }
+
+  void _loadBalance() async {
+    String bal = await SessionManager.getWalletBalance();
+    setState(() {
+      walletBalance = bal;
+    });
+  }
+
+
+
+
   String selectedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
   final TextEditingController digitController = TextEditingController();
   final TextEditingController pointsController = TextEditingController();
@@ -36,23 +57,36 @@ class _TriplepattiState extends State<Triplepatti> {
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         actions: [
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              // border: Border.all(color: Colors.black, width: 1),
-              // borderRadius: BorderRadius.circular(8),
-            ),
-            child: Row(
-              children: [
-                IconButton(onPressed: (){
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>Walletscreen()));
-                }, icon: Icon(Icons.account_balance_wallet_outlined)),
-
-                SizedBox(width: 5),
-                //Text("393", style: TextStyle(color: Colors.black)),
-              ],
-            ),
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2,color: Colors.black),
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.account_balance_wallet, color: Colors.black),
+                    const SizedBox(width: 5),
+                    Text(
+                      "₹ $walletBalance",
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              )
           )
         ],
       ),

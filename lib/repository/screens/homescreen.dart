@@ -1,18 +1,139 @@
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:all/repository/screens/dashboardscreen.dart';
 import 'package:all/repository/screens/walletscreen.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-
-import '../../../domain/constants/appcolors.dart';
+import '../../utils/session_manager.dart';
 import 'navbar.dart';
+import '../../repository/models/market_model.dart';
 
+class Homescreen extends StatefulWidget {
+  const Homescreen({super.key});
 
-class Homescreen extends StatefulWidget{
   @override
   State<Homescreen> createState() => _HomescreenState();
 }
 
 class _HomescreenState extends State<Homescreen> {
+  String walletBalance = "0";
+  List<Market> markets = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBalance();
+    fetchMarkets();
+  }
+
+  void _loadBalance() async {
+    String bal = await SessionManager.getWalletBalance();
+    setState(() {
+      walletBalance = bal;
+    });
+  }
+
+  Future<void> fetchMarkets() async {
+    final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      final marketsJson = data["markets"] as List;
+      final List<Market> fetchedMarkets = marketsJson.map((e) => Market.fromJson(e)).toList();
+
+      // 🔹 Sort markets by open_time
+      fetchedMarkets.sort((a, b) {
+        DateTime timeA = _parseTime(a.opent);
+        DateTime timeB = _parseTime(b.opent);
+        return timeA.compareTo(timeB);
+      });
+
+      setState(() {
+        markets = fetchedMarkets;
+        isLoading = false;
+      });
+    } else {
+      throw Exception("Failed to load markets");
+    }
+  }
+
+
+// Helper function to parse "10:00 AM" → DateTime
+  DateTime _parseTime(String time) {
+    try {
+      return DateTime.parse(
+          "${DateTime.now().toIso8601String().split("T")[0]} ${_formatTime24(time)}:00"
+      );
+    } catch (e) {
+      return DateTime.now();
+    }
+  }
+
+  String _formatTime24(String time) {
+    final inputFormat = RegExp(r"(\d{1,2}):(\d{2})\s?(AM|PM)", caseSensitive: false);
+    final match = inputFormat.firstMatch(time);
+    if (match != null) {
+      int hour = int.parse(match.group(1)!);
+      int minute = int.parse(match.group(2)!);
+      String period = match.group(3)!.toUpperCase();
+
+      if (period == "PM" && hour != 12) hour += 12;
+      if (period == "AM" && hour == 12) hour = 0;
+
+      return "${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}";
+    }
+    return "00:00"; // default
+  }
+
+
+  // Function to check status + color
+
+  Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
+    DateTime now = DateTime.now();
+
+    // Time parsing: HH:mm format
+    DateTime today = DateTime(now.year, now.month, now.day);
+    List<String> openParts = openTime.split(":");
+    List<String> closeParts = closeTime.split(":");
+
+    DateTime openDateTime = today.add(
+        Duration(hours: int.parse(openParts[0]), minutes: int.parse(openParts[1])));
+    DateTime closeDateTime = today.add(
+        Duration(hours: int.parse(closeParts[0]), minutes: int.parse(closeParts[1])));
+
+    // Check the status
+    if (now.isBefore(openDateTime)) {
+      return {
+        "text": "Betting Is Closed",
+        "color": Colors.red,
+      };
+    } else if (now.isAtSameMomentAs(closeDateTime)) {
+      return {
+        "text": "Betting Is Running For Close",
+        "color": Colors.orange,
+      };
+    } else if (now.isAfter(openDateTime) && now.isBefore(closeDateTime)) {
+      return {
+        "text": "Betting Is Running",
+        "color": Colors.green,
+      };
+    } else if (now.isAfter(closeDateTime)) {
+      return {
+        "text": "Betting Is Closed",
+        "color": Colors.red,
+      };
+    }
+
+    return {
+      "text": "Unknown Status",
+      "color": Colors.grey,
+    };
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,44 +154,53 @@ class _HomescreenState extends State<Homescreen> {
             ),
           ],
         ),
-        // leading: IconButton(onPressed: (){
-        // }, icon: Icon(Icons.menu)),
         actions: [
-          IconButton(onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context)=>Walletscreen()));
-          }, icon: Icon(Icons.account_balance_wallet_outlined))
+          GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
+                );
+              },
+              child: Container(
+                margin: const EdgeInsets.all(10),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  border: Border.all(width: 2, color: Colors.black),
+                  color: Colors.orange,
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.account_balance_wallet, color: Colors.black),
+                    SizedBox(width: 6),
+                    Text(
+                      "₹ $walletBalance",
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
+              ))
         ],
       ),
       body: SafeArea(
-        child: ListView(
+        child: isLoading
+            ? Center(child: CircularProgressIndicator(color: Colors.orange))
+            : ListView(
           padding: const EdgeInsets.all(12),
           children: [
             const HeaderRow(),
             const SizedBox(height: 12),
-            GameCard(
-              title: "SITA MORNING",
-              result: "490-3*-***",
-              openTime: "09:40 AM",
-              closeTime: "10:40 AM",
-            ),
-            GameCard(
-              title: "KARNATAKA DAY",
-              result: "***-**-***",
-              openTime: "09:55 AM",
-              closeTime: "10:55 AM",
-            ),
-            GameCard(
-              title: "STAR TARA MORNING",
-              result: "280-0*-***",
-              openTime: "10:05 AM",
-              closeTime: "11:05 AM",
-            ),
-            GameCard(
-              title: "MILAN MORNING",
-              result: "***-**-***",
-              openTime: "10:10 AM",
-              closeTime: "11:10 AM",
-            ),
+            ...markets.map((m) => GameCard(
+              title: m.name,
+              result: "${m.ank1}-${m.total}${m.total2}-${m.ank2}",
+              openTime: m.opent,
+              closeTime: m.closet,
+            )),
           ],
         ),
       ),
@@ -100,7 +230,6 @@ class HeaderRow extends StatelessWidget {
           children: const [
             HeaderButton(text: "+918866095777", icon: Icons.phone),
             HeaderButton(text: "+918866095777", icon: Icons.chat)
-
           ],
         ),
       ],
@@ -180,7 +309,8 @@ class GameCard extends StatelessWidget {
                     backgroundColor: Colors.orange.shade500,
                   ),
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>DashboardPage()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => DashboardPage()));
                   },
                   child: const Text("Place Bet",
                       style: TextStyle(color: Colors.black)),
