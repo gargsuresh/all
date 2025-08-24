@@ -3,25 +3,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 import '../../utils/session_manager.dart';
 
 class Jodi extends StatefulWidget {
-  const Jodi({super.key});
+  final String mid;
+  final String cmid;
+  const Jodi({super.key, required this.mid, required this.cmid});
 
   @override
   State<Jodi> createState() => _JodiState();
 }
 
 class _JodiState extends State<Jodi> {
-
-
   String walletBalance = "0";
+  String marketName = ""; // ✅ Dynamic market name
 
   @override
   void initState() {
     super.initState();
     _loadBalance();
+    _fetchMarketName();
   }
 
   void _loadBalance() async {
@@ -31,10 +35,37 @@ class _JodiState extends State<Jodi> {
     });
   }
 
+  Future<void> _fetchMarketName() async {
+    try {
+      final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final marketsJson = data["markets"] as List;
+
+        final market = marketsJson.firstWhere(
+              (m) => m["mid"] == widget.mid && m["cmid"] == widget.cmid,
+          orElse: () => null,
+        );
+
+        if (market != null) {
+          setState(() {
+            marketName = market["name"] ?? "Unknown Market";
+          });
+        } else {
+          setState(() {
+            marketName = "Unknown Market";
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        marketName = "Unknown Market";
+      });
+    }
+  }
 
 
   String selectedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
-
   final TextEditingController digitController = TextEditingController();
   final TextEditingController pointsController = TextEditingController();
   List<Map<String, String>> bids = [];
@@ -99,7 +130,7 @@ class _JodiState extends State<Jodi> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _customButton(Icons.calendar_today, selectedDate),
-                _customButton(null, "MILAN DAY CLOSE"),
+                _customButton(null, marketName),
               ],
             ),
             SizedBox(height: 20),
@@ -119,7 +150,7 @@ class _JodiState extends State<Jodi> {
                 if (digitController.text.isNotEmpty &&
                     pointsController.text.isNotEmpty) {
                   int numValue = int.tryParse(digitController.text) ?? -1;
-                  if (numValue >= 0 && numValue <= 999) {
+                  if (numValue >= 0 && numValue <= 99) {
                     setState(() {
                       bids.add({
                         "digit": digitController.text,
@@ -175,7 +206,8 @@ class _JodiState extends State<Jodi> {
             ),
             ElevatedButton(
               onPressed: () {
-                // Submit functionality
+                // ✅ Submit API call
+                // Send bids along with mid & cmid
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Color(0xFFFFA64D),

@@ -7,6 +7,11 @@ class Market {
   final String ank2;
   final String total;
   final String total2;
+  final String mid;
+  final String cmid;
+  final String date;
+  final String openm;
+
 
   Market({
     required this.id,
@@ -17,6 +22,10 @@ class Market {
     required this.ank2,
     required this.total,
     required this.total2,
+    required this.mid,
+    required this.cmid,
+    required this.date,
+    required this.openm,
   });
 
   factory Market.fromJson(Map<String, dynamic> json) {
@@ -29,6 +38,10 @@ class Market {
       ank2: json['ank2'] ?? '',
       total: json['total'] ?? '',
       total2: json['total2'] ?? '',
+      mid: json['mid'] ?? '',
+      cmid: json['cmid'] ?? '',
+      date: json['date'] ?? '',
+      openm: json['openm'] ?? '',
     );
   }
 }

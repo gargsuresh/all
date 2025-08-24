@@ -1,24 +1,30 @@
+import 'dart:convert';
+
 import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../../utils/session_manager.dart';
 
 class Triplepatti extends StatefulWidget {
-  const Triplepatti({super.key});
+  final String mid;
+  final String cmid;
+  const Triplepatti({super.key, required this.mid, required this.cmid});
 
   @override
   State<Triplepatti> createState() => _TriplepattiState();
 }
 
 class _TriplepattiState extends State<Triplepatti> {
-
   String walletBalance = "0";
+  String marketName = ""; // ✅ Dynamic market name
 
   @override
   void initState() {
     super.initState();
     _loadBalance();
+    _fetchMarketName();
   }
 
   void _loadBalance() async {
@@ -26,6 +32,35 @@ class _TriplepattiState extends State<Triplepatti> {
     setState(() {
       walletBalance = bal;
     });
+  }
+
+  Future<void> _fetchMarketName() async {
+    try {
+      final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final marketsJson = data["markets"] as List;
+
+        final market = marketsJson.firstWhere(
+              (m) => m["mid"] == widget.mid && m["cmid"] == widget.cmid,
+          orElse: () => null,
+        );
+
+        if (market != null) {
+          setState(() {
+            marketName = market["name"] ?? "Unknown Market";
+          });
+        } else {
+          setState(() {
+            marketName = "Unknown Market";
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        marketName = "Unknown Market";
+      });
+    }
   }
 
 
@@ -98,7 +133,7 @@ class _TriplepattiState extends State<Triplepatti> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _customButton(Icons.calendar_today, selectedDate),
-                _customButton(null, "MILAN DAY CLOSE"),
+                _customButton(null, marketName),
               ],
             ),
             SizedBox(height: 20),

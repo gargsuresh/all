@@ -5,18 +5,19 @@ import 'package:all/repository/screens/singleank.dart';
 import 'package:all/repository/screens/singlepatti.dart';
 import 'package:all/repository/screens/triplepatti.dart';
 import 'package:flutter/material.dart';
-
 import 'jodi.dart';
 
 class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
+  final String mid;
+  final String cmid;
+
+  const DashboardPage({super.key, required this.mid, required this.cmid});
 
   @override
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
 class _DashboardPageState extends State<DashboardPage> {
-  // Card data (image + title)
   final List<Map<String, String>> cardItems = [
     {"title": "Single Ank", "image": "assets/icons/sing.png"},
     {"title": "Jodi", "image": "assets/icons/jodi.png"},
@@ -25,11 +26,6 @@ class _DashboardPageState extends State<DashboardPage> {
     {"title": "Triple Patti", "image": "assets/icons/triple.png"},
     {"title": "Half Sangam", "image": "assets/icons/half.png"},
     {"title": "Full Sangam", "image": "assets/icons/full.png"},
-    // {"title": "Group Jodi", "image": "assets/icons/group_jodi.png"},
-    // {"title": "Panel Group", "image": "assets/icons/cards.png"},
-    // {"title": "Bulk Jodi", "image": "assets/icons/dice_bulk.png"},
-    // {"title": "Bulk SP", "image": "assets/icons/spade_bulk.png"},
-    // {"title": "Bulk DP", "image": "assets/icons/spade_double_bulk.png"},
   ];
 
   @override
@@ -41,9 +37,7 @@ class _DashboardPageState extends State<DashboardPage> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context); // Back button ka action
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           "DASHBOARD",
@@ -54,7 +48,7 @@ class _DashboardPageState extends State<DashboardPage> {
         padding: const EdgeInsets.all(12.0),
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3, // 3 cards in each row
+            crossAxisCount: 3,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
             childAspectRatio: 0.9,
@@ -64,30 +58,63 @@ class _DashboardPageState extends State<DashboardPage> {
             return DashboardCard(
               title: cardItems[index]["title"]!,
               imagePath: cardItems[index]["image"]!,
-                onTap: () {
-                  if (cardItems[index]["title"] == "Single Ank") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Singleank()));
-                  } else if (cardItems[index]["title"] == "Jodi") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Jodi()));
-                  } else if (cardItems[index]["title"] == "Single Patti") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Singlepatti()));
-                  } else if (cardItems[index]["title"] == "Double Patti") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Doublepatti()));
-                  } else if (cardItems[index]["title"] == "Triple Patti") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Triplepatti()));
-                  } else if (cardItems[index]["title"] == "Half Sangam") {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Halfsangam()));
-                  } else if (cardItems[index]["title"] == "Full Sangam") {
-                    Navigator.push(context, MaterialPageRoute(builder: (
-                        context) => Fullsangam()));
-                  }
-                });
+              onTap: () {
+                String title = cardItems[index]["title"]!;
+                if (cardItems[index]["title"] == "Single Ank") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => Singleank(
+                            mid: widget.mid, cmid: widget.cmid)),
+                  );
+                } else if (cardItems[index]["title"] == "Jodi") {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => Jodi(
+                              mid: widget.mid,
+                              cmid: widget.cmid
+                          )
+                      )
+                  );
+                } else if (cardItems[index]["title"] == "Single Patti") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Singlepatti(mid: widget.mid, cmid: widget.cmid)),
+                  );
+                } else if (cardItems[index]["title"] == "Double Patti") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Doublepatti(mid: widget.mid, cmid: widget.cmid)),
+                  );
+                } else if (cardItems[index]["title"] == "Triple Patti") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Triplepatti(mid: widget.mid, cmid: widget.cmid)),
+                  );
+                } else if (cardItems[index]["title"] ==  "Half Sangam") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Halfsangam(mid: widget.mid, cmid: widget.cmid)),
+                  );
+                } else if (cardItems[index]["title"] == "Full Sangam") {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            Fullsangam(mid: widget.mid, cmid: widget.cmid)),
+                  );
+                }
+              },
+            );
           },
         ),
       ),
@@ -100,12 +127,8 @@ class DashboardCard extends StatelessWidget {
   final String imagePath;
   final VoidCallback onTap;
 
-  const DashboardCard({
-    super.key,
-    required this.title,
-    required this.imagePath,
-    required this.onTap,
-  });
+  const DashboardCard(
+      {super.key, required this.title, required this.imagePath, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

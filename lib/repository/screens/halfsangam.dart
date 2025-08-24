@@ -1,11 +1,16 @@
+import 'dart:convert';
+
 import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 import '../../utils/session_manager.dart';
 
 class Halfsangam extends StatefulWidget {
-  const Halfsangam({super.key});
+  final String mid;
+  final String cmid;
+  const Halfsangam({super.key, required this.mid, required this.cmid});
 
   @override
   State<Halfsangam> createState() => _HalfsangamState();
@@ -13,14 +18,14 @@ class Halfsangam extends StatefulWidget {
 
 class _HalfsangamState extends State<Halfsangam> {
 
-
-
   String walletBalance = "0";
+  String marketName = ""; // ✅ Dynamic market name
 
   @override
   void initState() {
     super.initState();
     _loadBalance();
+    _fetchMarketName();
   }
 
   void _loadBalance() async {
@@ -30,6 +35,34 @@ class _HalfsangamState extends State<Halfsangam> {
     });
   }
 
+  Future<void> _fetchMarketName() async {
+    try {
+      final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final marketsJson = data["markets"] as List;
+
+        final market = marketsJson.firstWhere(
+              (m) => m["mid"] == widget.mid && m["cmid"] == widget.cmid,
+          orElse: () => null,
+        );
+
+        if (market != null) {
+          setState(() {
+            marketName = market["name"] ?? "Unknown Market";
+          });
+        } else {
+          setState(() {
+            marketName = "Unknown Market";
+          });
+        }
+      }
+    } catch (e) {
+      setState(() {
+        marketName = "Unknown Market";
+      });
+    }
+  }
 
 
   String selectedDate = DateFormat('dd/MM/yyyy').format(DateTime.now());
@@ -149,11 +182,16 @@ class _HalfsangamState extends State<Halfsangam> {
                           offset: Offset(2, 2))
                     ],
                   ),
-                  child: Row(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      const Icon(Icons.calendar_month, color: Colors.orange),
-                      const SizedBox(width: 5),
-                      Text(selectedDate),
+                      Row(
+                        children: [
+                          const Icon(Icons.calendar_month, color: Colors.orange),
+                          const SizedBox(width: 5),
+                          Text(selectedDate),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -239,6 +277,40 @@ class _HalfsangamState extends State<Halfsangam> {
       ),
     );
   }
+
+
+
+
+
+
+  Widget _customButton(IconData? icon, String text) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 5)
+        ],
+      ),
+      child: Row(
+        children: [
+          if (icon != null) Icon(icon, color: Colors.orange),
+          if (icon != null) SizedBox(width: 8),
+          Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
+        ],
+      ),
+    );
+  }
+
+
+
+
+
+
+
+
+
 
   Widget _buildClickableField(
       String label, TextEditingController controller) {

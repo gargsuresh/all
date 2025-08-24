@@ -169,7 +169,7 @@ class _HomescreenState extends State<Homescreen> {
               title: m.name,
               result: "${m.ank1}-${m.total}${m.total2}-${m.ank2}",
               openTime: m.opent,
-              closeTime: m.closet,
+              closeTime: m.closet, mid: m.mid, cmid: m.cmid,
             )),
           ],
         ),
@@ -227,12 +227,16 @@ class GameCard extends StatelessWidget {
   final String result;
   final String openTime;
   final String closeTime;
+  final String mid;   // primary market id
+  final String cmid;  // secondary market id
 
   const GameCard({
     required this.title,
     required this.result,
     required this.openTime,
     required this.closeTime,
+    required this.mid,
+    required this.cmid,
     super.key,
   });
 
@@ -286,8 +290,16 @@ class GameCard extends StatelessWidget {
                     backgroundColor: Colors.orange.shade500,
                   ),
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => DashboardPage()));
+                    // ✅ Pass only mid and cmid
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DashboardPage(
+                          mid: mid,
+                          cmid: cmid,
+                        ),
+                      ),
+                    );
                   },
                   child: const Text("Place Bet",
                       style: TextStyle(color: Colors.black)),

@@ -5,7 +5,9 @@ import 'package:intl/intl.dart';
 import '../../utils/session_manager.dart';
 
 class Fullsangam extends StatefulWidget {
-  const Fullsangam({super.key});
+  final String mid;
+  final String cmid;
+  const Fullsangam({super.key, required this.mid, required this.cmid});
 
   @override
   State<Fullsangam> createState() => _FullsangamState();
