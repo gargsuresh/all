@@ -1,5 +1,4 @@
 import 'package:all/repository/screens/loginscreen.dart';
-import 'package:all/repository/screens/walletscreen.dart';
 import 'package:flutter/material.dart';
 
 class LogoutPage extends StatelessWidget {

@@ -1,8 +1,6 @@
 import 'package:all/repository/screens/otpscreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import '../../domain/constants/appcolors.dart';
 import '../widgets/uihelper.dart';
 
@@ -55,7 +53,7 @@ class _PhoneauthState extends State<PhoneAuth> {
                   ),
                   child: Column(
                     children: [
-                      Container(
+                      SizedBox(
                         width: 350,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,

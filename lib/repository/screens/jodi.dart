@@ -1,5 +1,4 @@
 import 'package:all/repository/screens/walletscreen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
@@ -232,7 +231,7 @@ class _JodiState extends State<Jodi> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 5)
+          BoxShadow(color: Colors.grey, blurRadius: 5)
         ],
       ),
       child: Row(

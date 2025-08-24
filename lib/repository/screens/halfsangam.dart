@@ -238,13 +238,13 @@ class _HalfsangamState extends State<Halfsangam> {
                       ...entries.map((entry) {
                         return TableRow(children: [
                           _clickableTableCell(entry["Sangam"]!, () {
-                            print("Clicked Sangam: ${entry['Sangam']}");
+                            ("Clicked Sangam: ${entry['Sangam']}");
                           }),
                           _clickableTableCell(entry["Points"]!, () {
-                            print("Clicked Points: ${entry['Points']}");
+                            ("Clicked Points: ${entry['Points']}");
                           }),
                           _clickableTableCell(entry["GameType"]!, () {
-                            print("Clicked Game Type: ${entry['GameType']}");
+                           ("Clicked Game Type: ${entry['GameType']}");
                           }),
                           IconButton(
                             icon: const Icon(Icons.delete, color: Colors.orange),
@@ -267,7 +267,7 @@ class _HalfsangamState extends State<Halfsangam> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange, foregroundColor: Colors.white),
               onPressed: () {
-                print("Submit Clicked");
+                ("Submit Clicked");
               },
               child: Text(
                   "SUBMIT (BIDS=${entries.length} POINTS=${entries.fold(0, (sum, e) => sum + int.parse(e['Points']!))})"),
@@ -278,45 +278,11 @@ class _HalfsangamState extends State<Halfsangam> {
     );
   }
 
-
-
-
-
-
-  Widget _customButton(IconData? icon, String text) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(color: Colors.grey.withOpacity(0.2), blurRadius: 5)
-        ],
-      ),
-      child: Row(
-        children: [
-          if (icon != null) Icon(icon, color: Colors.orange),
-          if (icon != null) SizedBox(width: 8),
-          Text(text, style: TextStyle(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
-  }
-
-
-
-
-
-
-
-
-
-
   Widget _buildClickableField(
       String label, TextEditingController controller) {
     return GestureDetector(
       onTap: () {
-        print("Clicked on $label");
+       ("Clicked on $label");
       },
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 6),

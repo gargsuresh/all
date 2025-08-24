@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Chatscreen extends StatefulWidget{
+  const Chatscreen({super.key});
+
   @override
   State<Chatscreen> createState() => _ChatscreenState();
 }

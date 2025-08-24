@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../api_service.dart';
 import '../../utils/session_manager.dart';
 
 class AddFundsScreen extends StatefulWidget {
@@ -185,7 +182,7 @@ class _AddFundsScreenState extends State<AddFundsScreen> {
                     );
                   } else {
                     // yaha backend call karna hoga
-                    print("Adding Funds: ₹${amountController.text}");
+                    ("Adding Funds: ₹${amountController.text}");
                   }
                 },
                 child: const Text(

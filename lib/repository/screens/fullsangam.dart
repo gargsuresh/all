@@ -188,7 +188,7 @@ class _FullsangamState extends State<Fullsangam> {
               style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange, foregroundColor: Colors.white),
               onPressed: () {
-                print("Submit Clicked");
+                ("Submit Clicked");
               },
               child: Text(
                   "SUBMIT (BIDS=${entries.length} POINTS=${entries.fold(0, (sum, e) => sum + int.parse(e['Points']!))})"),

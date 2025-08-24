@@ -100,7 +100,7 @@ class _HomescreenState extends State<Homescreen> {
         if (period == "AM" && hour == 12) hour = 0;
         return DateTime.now().copyWith(hour: hour, minute: minute);
       }
-    } catch (e) {}
+    } catch (e) {(e);}
     return DateTime.now();
   }
 

@@ -1,8 +1,4 @@
-
-import 'package:all/repository/screens/dashboardscreen.dart';
-import 'package:all/repository/screens/walletscreen.dart';
 import 'package:all/repository/screens/withdrawscreen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'allbidscreen.dart';
@@ -12,6 +8,8 @@ import 'homescreen.dart';
 
 
 class BottomNavscreen extends StatefulWidget {
+  const BottomNavscreen({super.key});
+
   @override
   State<BottomNavscreen> createState() => _BottomNavscreenState();
 }

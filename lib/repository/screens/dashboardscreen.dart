@@ -59,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
               title: cardItems[index]["title"]!,
               imagePath: cardItems[index]["image"]!,
               onTap: () {
-                String title = cardItems[index]["title"]!;
+                String _ = cardItems[index]["title"]!;
                 if (cardItems[index]["title"] == "Single Ank") {
                   Navigator.push(
                     context,

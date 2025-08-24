@@ -1,8 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import '../../domain/constants/appcolors.dart';
 import '../widgets/uihelper.dart';
 import 'bottomnavscreen.dart';
@@ -10,7 +8,7 @@ import 'bottomnavscreen.dart';
 class OtpScreen extends StatefulWidget {
   final String verificationId; // renamed for clarity
 
-  const OtpScreen({required this.verificationId, Key? key}) : super(key: key);
+  const OtpScreen({required this.verificationId, super.key});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -92,7 +90,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   child: Column(
                     children: [
                       SizedBox(height: 20),
-                      Container(
+                      SizedBox(
                         width: 350,
                         child: TextField(
                           controller: otpController,

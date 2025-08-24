@@ -1,7 +1,8 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AllBidscreen extends StatefulWidget{
+  const AllBidscreen({super.key});
+
   @override
   State<AllBidscreen> createState() => _AllBidscreenState();
 }

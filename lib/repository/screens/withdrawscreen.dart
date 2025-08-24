@@ -1,5 +1,4 @@
 import 'package:all/repository/screens/walletscreen.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 
@@ -59,7 +58,7 @@ class _WithdrawscreenState extends State<Withdrawscreen> {
                 borderRadius: BorderRadius.circular(8),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
+                    color: Colors.black,
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),

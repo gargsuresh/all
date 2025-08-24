@@ -6,6 +6,8 @@ import '../widgets/uihelper.dart';
 import 'loginscreen.dart';
 
 class Registerscreen extends StatefulWidget {
+  const Registerscreen({super.key});
+
   @override
   State<Registerscreen> createState() => _RegisterscreenState();
 }

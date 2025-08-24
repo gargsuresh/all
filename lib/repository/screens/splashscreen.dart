@@ -1,14 +1,12 @@
 import 'dart:async';
-
-import 'package:all/repository/screens/phoneAuth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import '../../domain/constants/appcolors.dart';
 import '../widgets/uihelper.dart';
 import 'loginscreen.dart';
 
 class Splashscreen extends StatefulWidget {
+  const Splashscreen({super.key});
+
   @override
   State<Splashscreen> createState() => _SplashscreenState();
 }
@@ -16,6 +14,7 @@ class Splashscreen extends StatefulWidget {
 class _SplashscreenState extends State<Splashscreen> {
   @override
   void initState() {
+    super.initState();
     Timer(Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
