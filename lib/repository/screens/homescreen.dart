@@ -31,8 +31,6 @@ Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
   if (now.isBefore(openDateTime)) {
     return {"text": "Betting Is Running", "color": Colors.green};
   } else if (now.isAfter(openDateTime) && now.isBefore(closeDateTime)) {
-    return {"text": "Betting Is Running", "color": Colors.green};
-  } else if (now.isAtSameMomentAs(closeDateTime)) {
     return {"text": "Betting Is Running For Close", "color": Colors.orange};
   } else {
     return {"text": "Betting Is Closed", "color": Colors.red};
