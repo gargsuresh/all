@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AllBidscreen extends StatefulWidget{
+class AllBidscreen extends StatefulWidget {
   const AllBidscreen({super.key});
 
   @override
@@ -14,8 +14,10 @@ class _AllBidscreenState extends State<AllBidscreen> {
       backgroundColor: Colors.orange.shade100,
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: const Text('Bidding History',
-            style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text(
+          'Bidding History',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
       ),
       body: ListView.builder(
         padding: const EdgeInsets.all(12),
@@ -112,11 +114,15 @@ class BidCard extends StatelessWidget {
                   child: Text(
                     bid.title,
                     style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.orange),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
                   ),
                 ),
-                Text("✮ ${bid.bidId}",
-                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(
+                  "✮ ${bid.bidId}",
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
               ],
             ),
             const SizedBox(height: 6),
@@ -136,7 +142,7 @@ class BidCard extends StatelessWidget {
                 color: bid.isWin ? Colors.green : Colors.red,
                 fontWeight: FontWeight.bold,
               ),
-            )
+            ),
           ],
         ),
       ),

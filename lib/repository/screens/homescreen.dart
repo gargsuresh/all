@@ -1,13 +1,10 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'package:all/repository/screens/dashboardscreen.dart';
-import 'package:all/repository/screens/walletscreen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../bloc/market/market_bloc.dart';
 import '../../utils/session_manager.dart';
+import '../screens/dashboardscreen.dart';
 import 'navbar.dart';
-import '../../repository/models/market_model.dart';
 
-/// ✅ Top-level function for dynamic betting status
 Map<String, dynamic> getBettingStatus(String openTime, String closeTime) {
   DateTime now = DateTime.now();
 
@@ -46,14 +43,12 @@ class Homescreen extends StatefulWidget {
 
 class _HomescreenState extends State<Homescreen> {
   String walletBalance = "0";
-  List<Market> markets = [];
-  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
     _loadBalance();
-    fetchMarkets();
+    context.read<MarketBloc>().add(FetchMarkets());
   }
 
   void _loadBalance() async {
@@ -61,45 +56,6 @@ class _HomescreenState extends State<Homescreen> {
     setState(() {
       walletBalance = bal;
     });
-  }
-
-  Future<void> fetchMarkets() async {
-    final response = await http.get(Uri.parse("https://atozmatka.com/api/get_markets.php"));
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-      final marketsJson = data["markets"] as List;
-      final List<Market> fetchedMarkets = marketsJson.map((e) => Market.fromJson(e)).toList();
-
-      // Sort markets by open_time
-      fetchedMarkets.sort((a, b) {
-        DateTime timeA = _parseTime(a.opent);
-        DateTime timeB = _parseTime(b.opent);
-        return timeA.compareTo(timeB);
-      });
-
-      setState(() {
-        markets = fetchedMarkets;
-        isLoading = false;
-      });
-    } else {
-      throw Exception("Failed to load markets");
-    }
-  }
-
-  DateTime _parseTime(String time) {
-    try {
-      final inputFormat = RegExp(r"(\d{1,2}):(\d{2})\s?(AM|PM)", caseSensitive: false);
-      final match = inputFormat.firstMatch(time);
-      if (match != null) {
-        int hour = int.parse(match.group(1)!);
-        int minute = int.parse(match.group(2)!);
-        String period = match.group(3)!.toUpperCase();
-        if (period == "PM" && hour != 12) hour += 12;
-        if (period == "AM" && hour == 12) hour = 0;
-        return DateTime.now().copyWith(hour: hour, minute: minute);
-      }
-    } catch (e) {(e);}
-    return DateTime.now();
   }
 
   @override
@@ -110,112 +66,51 @@ class _HomescreenState extends State<Homescreen> {
       appBar: AppBar(
         elevation: 4,
         backgroundColor: Colors.orange,
-        title: Row(
-          children: const [
-            SizedBox(width: 8),
-            Text.rich(
-              TextSpan(
-                text: 'All IN ONE',
-                style: TextStyle(
-                    fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-            ),
-          ],
-        ),
+        title: const Text('All IN ONE', style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
         actions: [
           GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2, color: Colors.black),
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.account_balance_wallet, color: Colors.black),
-                    const SizedBox(width: 6),
-                    Text(
-                      "₹ $walletBalance",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ))
+            onTap: () {},
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(border: Border.all(width: 2, color: Colors.black), color: Colors.orange, borderRadius: BorderRadius.circular(20)),
+              child: Row(
+                children: [
+                  const Icon(Icons.account_balance_wallet, color: Colors.black),
+                  const SizedBox(width: 6),
+                  Text("₹ $walletBalance", style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       body: SafeArea(
-        child: isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.orange))
-            : ListView(
-          padding: const EdgeInsets.all(12),
-          children: [
-            const HeaderRow(),
-            const SizedBox(height: 12),
-            ...markets.map((m) => GameCard(
-              title: m.name,
-              result: "${m.ank1}-${m.total}${m.total2}-${m.ank2}",
-              openTime: m.opent,
-              closeTime: m.closet, mid: m.mid, cmid: m.cmid,
-            )),
-          ],
+        child: BlocBuilder<MarketBloc, MarketState>(
+          builder: (context, state) {
+            if (state is MarketLoading) {
+              return const Center(child: CircularProgressIndicator(color: Colors.orange));
+            } else if (state is MarketLoaded) {
+              final markets = state.markets;
+              return ListView(
+                padding: const EdgeInsets.all(12),
+                children: markets.map((m) => GameCard(
+                  title: m.name,
+                  result: "${m.ank1}-${m.total}${m.total2}-${m.ank2}",
+                  openTime: m.opent,
+                  closeTime: m.closet,
+                  mid: m.mid,
+                  cmid: m.cmid,
+                  marketName: m.name,
+                )).toList(),
+              );
+            } else if (state is MarketError) {
+              return Center(child: Text(state.message, style: const TextStyle(color: Colors.red)));
+            }
+            return const SizedBox.shrink();
+          },
         ),
       ),
-    );
-  }
-}
-
-class HeaderRow extends StatelessWidget {
-  const HeaderRow({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const SizedBox(height: 16),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
-            HeaderButton(text: "STARLINE", icon: Icons.star),
-            HeaderButton(text: "GAMES", icon: Icons.airplane_ticket),
-            HeaderButton(text: "JACKPOT", icon: Icons.play_circle),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: const [
-            HeaderButton(text: "+918866095777", icon: Icons.phone),
-            HeaderButton(text: "+918866095777", icon: Icons.chat)
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-class HeaderButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  const HeaderButton({required this.text, required this.icon, super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Chip(
-      label: Text(text),
-      avatar: Icon(icon, size: 16),
-      backgroundColor: Colors.orange,
     );
   }
 }
@@ -225,8 +120,9 @@ class GameCard extends StatelessWidget {
   final String result;
   final String openTime;
   final String closeTime;
-  final String mid;   // primary market id
-  final String cmid;  // secondary market id
+  final String mid;
+  final String cmid;
+  final String marketName;
 
   const GameCard({
     required this.title,
@@ -235,12 +131,13 @@ class GameCard extends StatelessWidget {
     required this.closeTime,
     required this.mid,
     required this.cmid,
+    required this.marketName,
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    final status = getBettingStatus(openTime, closeTime); // ✅ Dynamic status
+    final status = getBettingStatus(openTime, closeTime);
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 8),
@@ -253,27 +150,15 @@ class GameCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Text(title,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 const Spacer(),
-                Text(result,
-                    style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.orange)),
+                Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.orange)),
                 const SizedBox(width: 8),
                 const Icon(Icons.sports_soccer, color: Colors.orange),
               ],
             ),
             const SizedBox(height: 6),
-            Text(
-              status["text"],
-              style: TextStyle(
-                color: status["color"],
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+            Text(status["text"], style: TextStyle(color: status["color"], fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
             Row(
               children: [
@@ -284,26 +169,23 @@ class GameCard extends StatelessWidget {
                 Text(closeTime, style: const TextStyle(color: Colors.orange)),
                 const Spacer(),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange.shade500,
-                  ),
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade500),
                   onPressed: () {
-                    // ✅ Pass only mid and cmid
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => DashboardPage(
+                          marketName: marketName,
                           mid: mid,
                           cmid: cmid,
                         ),
                       ),
                     );
                   },
-                  child: const Text("Place Bet",
-                      style: TextStyle(color: Colors.black)),
+                  child: const Text("Place Bet", style: TextStyle(color: Colors.black)),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

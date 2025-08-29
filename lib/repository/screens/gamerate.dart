@@ -10,14 +10,44 @@ class Gamerate extends StatefulWidget {
 
 class _GamerateState extends State<Gamerate> {
   final List<Map<String, dynamic>> rates = const [
-    {"code": "SD", "title": "Single Digit", "rate": "₹10", "color": Colors.pink},
-    {"code": "JD", "title": "Jodi Digit", "rate": "₹100", "color": Colors.purple},
+    {
+      "code": "SD",
+      "title": "Single Digit",
+      "rate": "₹10",
+      "color": Colors.pink,
+    },
+    {
+      "code": "JD",
+      "title": "Jodi Digit",
+      "rate": "₹100",
+      "color": Colors.purple,
+    },
     // {"code": "RB", "title": "Red Bracket", "rate": "₹95", "color": Colors.orange},
-    {"code": "SP", "title": "Single Pana", "rate": "₹150", "color": Colors.green},
+    {
+      "code": "SP",
+      "title": "Single Pana",
+      "rate": "₹150",
+      "color": Colors.green,
+    },
     {"code": "DP", "title": "Double Pana", "rate": "₹300", "color": Colors.red},
-    {"code": "TP", "title": "Triple Pana", "rate": "₹1000", "color": Colors.blue},
-    {"code": "HS", "title": "Half Sangam", "rate": "₹1000", "color": Colors.deepOrange},
-    {"code": "FS", "title": "Full Sangam", "rate": "₹10000", "color": Colors.teal},
+    {
+      "code": "TP",
+      "title": "Triple Pana",
+      "rate": "₹1000",
+      "color": Colors.blue,
+    },
+    {
+      "code": "HS",
+      "title": "Half Sangam",
+      "rate": "₹1000",
+      "color": Colors.deepOrange,
+    },
+    {
+      "code": "FS",
+      "title": "Full Sangam",
+      "rate": "₹10000",
+      "color": Colors.teal,
+    },
   ];
 
   @override
@@ -39,29 +69,29 @@ class _GamerateState extends State<Gamerate> {
         ),
         actions: [
           GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AddFundsScreen()),
-                );
-              },
-              child: Container(
-                margin: const EdgeInsets.all(10),
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  border: Border.all(width: 2,color: Colors.black),
-                  color: Colors.orange,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: const [
-                    Icon(Icons.account_balance_wallet, color: Colors.black),
-                    SizedBox(width: 5),
-                    Text("₹393", style: TextStyle(color: Colors.black)),
-                  ],
-                ),
-              )
-          )
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => AddFundsScreen()),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.all(10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              decoration: BoxDecoration(
+                border: Border.all(width: 2, color: Colors.black),
+                color: Colors.orange,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: const [
+                  Icon(Icons.account_balance_wallet, color: Colors.black),
+                  SizedBox(width: 5),
+                  Text("₹393", style: TextStyle(color: Colors.black)),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
       body: Column(
@@ -78,15 +108,23 @@ class _GamerateState extends State<Gamerate> {
               itemBuilder: (context, index) {
                 final item = rates[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 6),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 15,
+                    vertical: 6,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: item["color"],
                       radius: 22,
                       child: Text(
                         item["code"],
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     title: Text(
@@ -95,7 +133,10 @@ class _GamerateState extends State<Gamerate> {
                     ),
                     trailing: Text(
                       item["rate"],
-                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 );
@@ -103,8 +144,7 @@ class _GamerateState extends State<Gamerate> {
             ),
           ),
         ],
-      )
+      ),
     );
-        }
+  }
 }
-
